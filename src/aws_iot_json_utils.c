@@ -47,12 +47,12 @@ int8_t jsoneq(const char *json, jsmntok_t *tok, const char *s) {
 
 IoT_Error_t parseUnsignedInteger32Value(uint32_t *i, const char *jsonString, jsmntok_t *token) {
 	if(token->type != JSMN_PRIMITIVE) {
-		IOT_WARN("Token was not an integer");
+		IOT_WARN(TAG, "Token was not an integer");
 		return JSON_PARSE_ERROR;
 	}
 
 	if(('-' == (char) (jsonString[token->start])) || (1 != sscanf(jsonString + token->start, "%u", i))) {
-		IOT_WARN("Token was not an unsigned integer.");
+		IOT_WARN(TAG, "Token was not an unsigned integer.");
 		return JSON_PARSE_ERROR;
 	}
 
@@ -61,12 +61,12 @@ IoT_Error_t parseUnsignedInteger32Value(uint32_t *i, const char *jsonString, jsm
 
 IoT_Error_t parseUnsignedInteger16Value(uint16_t *i, const char *jsonString, jsmntok_t *token) {
 	if(token->type != JSMN_PRIMITIVE) {
-		IOT_WARN("Token was not an integer");
+		IOT_WARN(TAG, "Token was not an integer");
 		return JSON_PARSE_ERROR;
 	}
 
 	if(('-' == (char) (jsonString[token->start])) || (1 != sscanf(jsonString + token->start, "%hu", i))) {
-		IOT_WARN("Token was not an unsigned integer.");
+		IOT_WARN(TAG, "Token was not an unsigned integer.");
 		return JSON_PARSE_ERROR;
 	}
 
@@ -75,12 +75,12 @@ IoT_Error_t parseUnsignedInteger16Value(uint16_t *i, const char *jsonString, jsm
 
 IoT_Error_t parseUnsignedInteger8Value(uint8_t *i, const char *jsonString, jsmntok_t *token) {
 	if(token->type != JSMN_PRIMITIVE) {
-		IOT_WARN("Token was not an integer");
+		IOT_WARN(TAG, "Token was not an integer");
 		return JSON_PARSE_ERROR;
 	}
 
 	if(('-' == (char) (jsonString[token->start])) || (1 != sscanf(jsonString + token->start, "%hhu", i))) {
-		IOT_WARN("Token was not an unsigned integer.");
+		IOT_WARN(TAG, "Token was not an unsigned integer.");
 		return JSON_PARSE_ERROR;
 	}
 
@@ -89,12 +89,12 @@ IoT_Error_t parseUnsignedInteger8Value(uint8_t *i, const char *jsonString, jsmnt
 
 IoT_Error_t parseInteger32Value(int32_t *i, const char *jsonString, jsmntok_t *token) {
 	if(token->type != JSMN_PRIMITIVE) {
-		IOT_WARN("Token was not an integer");
+		IOT_WARN(TAG, "Token was not an integer");
 		return JSON_PARSE_ERROR;
 	}
 
 	if(1 != sscanf(jsonString + token->start, "%i", i)) {
-		IOT_WARN("Token was not an integer.");
+		IOT_WARN(TAG, "Token was not an integer.");
 		return JSON_PARSE_ERROR;
 	}
 
@@ -103,12 +103,12 @@ IoT_Error_t parseInteger32Value(int32_t *i, const char *jsonString, jsmntok_t *t
 
 IoT_Error_t parseInteger16Value(int16_t *i, const char *jsonString, jsmntok_t *token) {
 	if(token->type != JSMN_PRIMITIVE) {
-		IOT_WARN("Token was not an integer");
+		IOT_WARN(TAG, "Token was not an integer");
 		return JSON_PARSE_ERROR;
 	}
 
 	if(1 != sscanf(jsonString + token->start, "%hi", i)) {
-		IOT_WARN("Token was not an integer.");
+		IOT_WARN(TAG, "Token was not an integer.");
 		return JSON_PARSE_ERROR;
 	}
 
@@ -117,12 +117,12 @@ IoT_Error_t parseInteger16Value(int16_t *i, const char *jsonString, jsmntok_t *t
 
 IoT_Error_t parseInteger8Value(int8_t *i, const char *jsonString, jsmntok_t *token) {
 	if(token->type != JSMN_PRIMITIVE) {
-		IOT_WARN("Token was not an integer");
+		IOT_WARN(TAG, "Token was not an integer");
 		return JSON_PARSE_ERROR;
 	}
 
 	if(1 != sscanf(jsonString + token->start, "%hhi", i)) {
-		IOT_WARN("Token was not an integer.");
+		IOT_WARN(TAG, "Token was not an integer.");
 		return JSON_PARSE_ERROR;
 	}
 
@@ -131,12 +131,12 @@ IoT_Error_t parseInteger8Value(int8_t *i, const char *jsonString, jsmntok_t *tok
 
 IoT_Error_t parseFloatValue(float *f, const char *jsonString, jsmntok_t *token) {
 	if(token->type != JSMN_PRIMITIVE) {
-		IOT_WARN("Token was not a float.");
+		IOT_WARN(TAG, "Token was not a float.");
 		return JSON_PARSE_ERROR;
 	}
 
 	if(1 != sscanf(jsonString + token->start, "%f", f)) {
-		IOT_WARN("Token was not a float.");
+		IOT_WARN(TAG, "Token was not a float.");
 		return JSON_PARSE_ERROR;
 	}
 
@@ -145,12 +145,12 @@ IoT_Error_t parseFloatValue(float *f, const char *jsonString, jsmntok_t *token) 
 
 IoT_Error_t parseDoubleValue(double *d, const char *jsonString, jsmntok_t *token) {
 	if(token->type != JSMN_PRIMITIVE) {
-		IOT_WARN("Token was not a double.");
+		IOT_WARN(TAG, "Token was not a double.");
 		return JSON_PARSE_ERROR;
 	}
 
 	if(1 != sscanf(jsonString + token->start, "%lf", d)) {
-		IOT_WARN("Token was not a double.");
+		IOT_WARN(TAG, "Token was not a double.");
 		return JSON_PARSE_ERROR;
 	}
 
@@ -159,7 +159,7 @@ IoT_Error_t parseDoubleValue(double *d, const char *jsonString, jsmntok_t *token
 
 IoT_Error_t parseBooleanValue(bool *b, const char *jsonString, jsmntok_t *token) {
 	if(token->type != JSMN_PRIMITIVE) {
-		IOT_WARN("Token was not a primitive.");
+		IOT_WARN(TAG, "Token was not a primitive.");
 		return JSON_PARSE_ERROR;
 	}
 	if(strncmp(jsonString + token->start, "true", 4) == 0) {
@@ -167,7 +167,7 @@ IoT_Error_t parseBooleanValue(bool *b, const char *jsonString, jsmntok_t *token)
 	} else if(strncmp(jsonString + token->start, "false", 5) == 0) {
 		*b = false;
 	} else {
-		IOT_WARN("Token was not a bool.");
+		IOT_WARN(TAG, "Token was not a bool.");
 		return JSON_PARSE_ERROR;
 	}
 	return SUCCESS;
@@ -178,12 +178,12 @@ IoT_Error_t parseStringValue(char *buf, size_t bufLen, const char *jsonString, j
 	size_t stringLength = (size_t)(token->end - token->start);
 
 	if(token->type != JSMN_STRING) {
-		IOT_WARN("Token was not a string.");
+		IOT_WARN(TAG, "Token was not a string.");
 		return JSON_PARSE_ERROR;
 	}
 
 	if (stringLength+1 > bufLen) {
-		IOT_WARN("Buffer too small to hold string value.");
+		IOT_WARN(TAG, "Buffer too small to hold string value.");
 		return SHADOW_JSON_ERROR;
 	}
 
@@ -198,7 +198,7 @@ jsmntok_t *findToken(const char *key, const char *jsonString, jsmntok_t *token) 
 	int i;
 
 	if(token->type != JSMN_OBJECT) {
-		IOT_WARN("Token was not an object.");
+		IOT_WARN(TAG, "Token was not an object.");
 		return NULL;
 	}
 

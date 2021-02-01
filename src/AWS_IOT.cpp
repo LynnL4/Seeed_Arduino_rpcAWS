@@ -38,26 +38,14 @@ and that both those copyright notices and this permission notice appear in suppo
 
 #include "aws_iot_mqtt_client.h"
 #include "aws_iot_mqtt_client_interface.h"
-
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "esp_event_loop.h"
-#include "esp_log.h"
-#include "esp_vfs_fat.h"
-#include "driver/sdmmc_host.h"
-
-
  
-static const char *TAG = "AWS_IOT";
 char AWS_IOT_HOST_ADDRESS[128];
 
 AWS_IoT_Client client;
 IoT_Publish_Message_Params paramsQOS0;
 pSubCallBackHandler_t subApplCallBackHandler = 0;
+
+TaskHandle_t Handle_aws_iot_task;
 
 void aws_iot_task(void *param);
 
@@ -72,7 +60,7 @@ void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, ui
 
     void disconnectCallbackHandler(AWS_IoT_Client *pClient, void *data)
     {
-        ESP_LOGW(TAG, "MQTT Disconnect");
+        IOT_WARN(TAG, "MQTT Disconnect");
         IoT_Error_t rc = FAILURE;
 
         if(!pClient) 
@@ -81,18 +69,18 @@ void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, ui
         }
 
         if(aws_iot_is_autoreconnect_enabled(pClient)) {
-            ESP_LOGI(TAG, "Auto Reconnect is enabled, Reconnecting attempt will start now");
+            IOT_INFO(TAG, "Auto Reconnect is enabled, Reconnecting attempt will start now");
         } 
         else
         {
-            ESP_LOGW(TAG, "Auto Reconnect not enabled. Starting manual reconnect...");
+            IOT_WARN(TAG, "Auto Reconnect not enabled. Starting manual reconnect...");
             // TODO - was commented out - check
             rc = aws_iot_mqtt_attempt_reconnect(pClient);
             if(NETWORK_RECONNECTED == rc) {
-                ESP_LOGW(TAG, "Manual Reconnect Successful");
+                IOT_WARN(TAG, "Manual Reconnect Successful");
             } 
             else {
-                ESP_LOGW(TAG, "Manual Reconnect Failed - %d", rc);
+                IOT_WARN(TAG, "Manual Reconnect Failed - %d", rc);
             }
         }
     }
@@ -102,17 +90,15 @@ void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, ui
                     const char *aws_root_ca_pem, 
                     const char *certificate_pem_crt, 
                     const char *private_pem_key) {
-        const size_t stack_size = 36*1024;
+        const size_t stack_size = 3*1024;
         
         strcpy(AWS_IOT_HOST_ADDRESS,hostAddress);
         IoT_Error_t rc = FAILURE;
 
-
         IoT_Client_Init_Params mqttInitParams = iotClientInitParamsDefault;
         IoT_Client_Connect_Params connectParams = iotClientConnectParamsDefault;
-        
 
-        ESP_LOGI(TAG, "AWS IoT SDK Version %d.%d.%d-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_TAG);
+        IOT_INFO(TAG, "AWS IoT SDK Version %d.%d.%d-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_TAG);
 
         mqttInitParams.enableAutoReconnect = false; // We enable this later below
         mqttInitParams.pHostURL = AWS_IOT_HOST_ADDRESS;
@@ -124,19 +110,20 @@ void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, ui
         mqttInitParams.pDevicePrivateKeyLocation = const_cast<char*>(private_pem_key);
 
 
-        mqttInitParams.mqttCommandTimeout_ms = 20000;
+        mqttInitParams.mqttCommandTimeout_ms  = 20000;
         mqttInitParams.tlsHandshakeTimeout_ms = 5000;
         mqttInitParams.isSSLHostnameVerify = true;
         mqttInitParams.disconnectHandler = disconnectCallbackHandler;
-    mqttInitParams.disconnectHandlerData = nullptr;
+        mqttInitParams.disconnectHandlerData = nullptr;
 
 
     rc = aws_iot_mqtt_init(&client, &mqttInitParams);
-   
+
     if(SUCCESS != rc) {
-        ESP_LOGE(TAG, "aws_iot_mqtt_init returned error : %d ", rc);
+        IOT_ERROR(TAG, "aws_iot_mqtt_init returned error : %d ", rc);
         return rc; //abort();
     }
+    IOT_INFO(TAG, "AWS IOT MQTT init successful!");
 
     connectParams.keepAliveIntervalInSec = 10;
     connectParams.isCleanSession = true;
@@ -146,14 +133,13 @@ void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, ui
     connectParams.clientIDLen = (uint16_t) strlen(clientID);
     connectParams.isWillMsgPresent = false;
 
-    ESP_LOGI(TAG, "Connecting to AWS...");
-    
+    IOT_INFO(TAG, "Connecting to AWS...");
+
     do {
         rc = aws_iot_mqtt_connect(&client, &connectParams);
         
         if(SUCCESS != rc) {
-            ESP_LOGE(TAG, "Error(%d) connecting to %s:%d, \n\rTrying to reconnect", rc, mqttInitParams.pHostURL, mqttInitParams.port);
-            
+            IOT_ERROR(TAG, "Error(%d) connecting to %s:%d, \n\rTrying to reconnect", rc, mqttInitParams.pHostURL, mqttInitParams.port);   
         }
         
     } while(SUCCESS != rc);
@@ -165,15 +151,17 @@ void iot_subscribe_callback_handler(AWS_IoT_Client *pClient, char *topicName, ui
      *  #AWS_IOT_MQTT_MAX_RECONNECT_WAIT_INTERVAL
      */
     // TODO - bock was commented out - check
-    rc = aws_iot_mqtt_autoreconnect_set_status(&client, true);
+    rc = aws_iot_mqtt_autoreconnect_set_status(&client, false);
     if(SUCCESS != rc) {
-        ESP_LOGE(TAG, "Unable to set Auto Reconnect to true - %d", rc);
+        IOT_ERROR(TAG, "Unable to set Auto Reconnect to true - %d", rc);
         abort();
     }    
-    
+     uint32_t freeheap = xPortGetFreeHeapSize();
     if(rc == SUCCESS)
-    xTaskCreatePinnedToCore(&aws_iot_task, "aws_iot_task", stack_size, nullptr, 5, nullptr, 1);
-
+    {   IOT_ERROR(TAG, "create aws iot task, free heap: %u", freeheap);
+        xTaskCreate(aws_iot_task, "aws_iot_task", stack_size, NULL, 2, &Handle_aws_iot_task);
+        IOT_ERROR(TAG, "create aws iot task SUCCESS");
+    }
     return rc;
 }
 
@@ -200,13 +188,13 @@ int AWS_IOT::subscribe(const char *subTopic, pSubCallBackHandler_t pSubCallBackH
     
     subApplCallBackHandler = pSubCallBackHandler;
 
-    ESP_LOGI(TAG, "Subscribing...");
+    IOT_INFO(TAG, "Subscribing...");
     rc = aws_iot_mqtt_subscribe(&client, subTopic, strlen(subTopic), QOS0, iot_subscribe_callback_handler, nullptr);
     if(SUCCESS != rc) {
-        ESP_LOGE(TAG, "Error subscribing : %d ", rc);
+        IOT_ERROR(TAG, "Error subscribing : %d ", rc);
         return rc;
     }
-    ESP_LOGI(TAG, "Subscribing... Successful");
+    IOT_INFO(TAG, "Subscribing... Successful");
     
     return rc;
 }
@@ -215,7 +203,7 @@ int AWS_IOT::subscribe(const char *subTopic, pSubCallBackHandler_t pSubCallBackH
 
 
 void aws_iot_task(void *param) {
-
+    IOT_FUNC_ENTRY
 IoT_Error_t rc = SUCCESS;
 
     while(1)

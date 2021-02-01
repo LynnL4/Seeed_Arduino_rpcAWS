@@ -189,7 +189,7 @@ static void AckStatusCallback(AWS_IoT_Client *pClient, char *topicName, uint16_t
 	IOT_UNUSED(pData);
 
 	if(params->payloadLen >= SHADOW_MAX_SIZE_OF_RX_BUFFER) {
-		IOT_WARN("Payload larger than RX Buffer");
+		IOT_WARN(TAG, "Payload larger than RX Buffer");
 		return;
 	}
 
@@ -197,7 +197,7 @@ static void AckStatusCallback(AWS_IoT_Client *pClient, char *topicName, uint16_t
 	shadowRxBuf[params->payloadLen] = '\0';    // jsmn_parse relies on a string
 
 	if(!isJsonValidAndParse(shadowRxBuf, SHADOW_MAX_SIZE_OF_RX_BUFFER, pJsonHandler, &tokenCount)) {
-		IOT_WARN("Received JSON is not valid");
+		IOT_WARN(TAG, "Received JSON is not valid");
 		return;
 	}
 
@@ -479,7 +479,7 @@ static void shadow_delta_callback(AWS_IoT_Client *pClient, char *topicName,
 	uint32_t dataLength;
 	uint32_t tempVersionNumber = 0;
 
-	FUNC_ENTRY;
+	IOT_FUNC_ENTRY;
 
 	IOT_UNUSED(pClient);
 	IOT_UNUSED(topicName);
@@ -487,7 +487,7 @@ static void shadow_delta_callback(AWS_IoT_Client *pClient, char *topicName,
 	IOT_UNUSED(pData);
 
 	if(params->payloadLen >= SHADOW_MAX_SIZE_OF_RX_BUFFER) {
-		IOT_WARN("Payload larger than RX Buffer");
+		IOT_WARN(TAG, "Payload larger than RX Buffer");
 		return;
 	}
 
@@ -495,7 +495,7 @@ static void shadow_delta_callback(AWS_IoT_Client *pClient, char *topicName,
 	shadowRxBuf[params->payloadLen] = '\0';    // jsmn_parse relies on a string
 
 	if(!isJsonValidAndParse(shadowRxBuf, SHADOW_MAX_SIZE_OF_RX_BUFFER, pJsonHandler, &tokenCount)) {
-		IOT_WARN("Received JSON is not valid");
+		IOT_WARN(TAG, "Received JSON is not valid");
 		return;
 	}
 
@@ -504,7 +504,7 @@ static void shadow_delta_callback(AWS_IoT_Client *pClient, char *topicName,
 			if(tempVersionNumber > shadowJsonVersionNum) {
 				shadowJsonVersionNum = tempVersionNumber;
 			} else {
-				IOT_WARN("Old Delta Message received - Ignoring rx: %d local: %d", tempVersionNumber,
+				IOT_WARN(TAG, "Old Delta Message received - Ignoring rx: %d local: %d", tempVersionNumber,
 						 shadowJsonVersionNum);
 				return;
 			}

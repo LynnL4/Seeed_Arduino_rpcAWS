@@ -18,13 +18,11 @@
 
 #ifndef AWS_IOTSDK_THREADS_PLATFORM_H
 #define AWS_IOTSDK_THREADS_PLATFORM_H
-
+#include "FreeRTOS.h"
+#include "semphr.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/semphr.h"
 
 /**
  * @brief Mutex Type

@@ -38,10 +38,10 @@ IoT_Error_t aws_iot_shadow_internal_action(const char *pThingName, ShadowActions
 	uint8_t indexAckWaitList;
 	char extractedClientToken[MAX_SIZE_CLIENT_ID_WITH_SEQUENCE];
 
-	FUNC_ENTRY;
+	IOT_FUNC_ENTRY;
 
 	if(NULL == pThingName || NULL == pJsonDocumentToBeSent) {
-		FUNC_EXIT_RC(NULL_VALUE_ERROR);
+		IOT_FUNC_EXIT_RC(NULL_VALUE_ERROR);
 	}
 
 	isClientTokenPresent = extractClientToken(pJsonDocumentToBeSent, jsonSize, extractedClientToken, MAX_SIZE_CLIENT_ID_WITH_SEQUENCE );
@@ -72,7 +72,7 @@ IoT_Error_t aws_iot_shadow_internal_action(const char *pThingName, ShadowActions
 						 timeout_seconds);
 	}
 
-	FUNC_EXIT_RC(ret_val);
+	IOT_FUNC_EXIT_RC(ret_val);
 }
 
 #ifdef __cplusplus

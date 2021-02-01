@@ -54,7 +54,7 @@ static IoT_Error_t emptyJsonWithClientToken(char *pBuffer, size_t bufferSize) {
         dataLenInBuffer = (size_t)snprintf(pBuffer, bufferSize, AWS_IOT_SHADOW_CLIENT_TOKEN_KEY);
     }else
 	{
-	    IOT_ERROR("NULL buffer in emptyJsonWithClientToken\n");
+	    IOT_ERROR(TAG, "NULL buffer in emptyJsonWithClientToken\n");
         rc = FAILURE;
 	}
 
@@ -67,7 +67,7 @@ static IoT_Error_t emptyJsonWithClientToken(char *pBuffer, size_t bufferSize) {
 	    else
 	    {
 	        rc = FAILURE;
-	        IOT_ERROR("Supplied buffer too small to create JSON file\n");
+	        IOT_ERROR(TAG, "Supplied buffer too small to create JSON file\n");
 	    }
     }
 
@@ -79,17 +79,17 @@ static IoT_Error_t emptyJsonWithClientToken(char *pBuffer, size_t bufferSize) {
 	        if ( dataLenInBuffer > bufferSize )
 	        {
 	            rc = FAILURE;
-	            IOT_ERROR( "Supplied buffer too small to create JSON file\n" );
+	            IOT_ERROR(TAG, "Supplied buffer too small to create JSON file\n" );
 	        }
 	    }
 	    else
 	    {
 	        rc = FAILURE;
-	        IOT_ERROR( "Supplied buffer too small to create JSON file\n" );
+	        IOT_ERROR(TAG, "Supplied buffer too small to create JSON file\n" );
 	    }
     }
 
-    FUNC_EXIT_RC(rc);
+    IOT_FUNC_EXIT_RC(rc);
 }
 
 IoT_Error_t aws_iot_shadow_internal_get_request_json(char *pBuffer, size_t bufferSize) {
@@ -387,13 +387,13 @@ bool isJsonValidAndParse(const char *pJsonDocument, size_t jsonSize, void *pJson
 							sizeof(jsonTokenStruct) / sizeof(jsonTokenStruct[0]));
 
 	if(tokenCount < 0) {
-		IOT_WARN("Failed to parse JSON: %d\n", tokenCount);
+		IOT_WARN(TAG, "Failed to parse JSON: %d\n", tokenCount);
 		return false;
 	}
 
 	/* Assume the top-level element is an object */
 	if(tokenCount < 1 || jsonTokenStruct[0].type != JSMN_OBJECT) {
-		IOT_WARN("Top Level is not an object\n");
+		IOT_WARN(TAG, "Top Level is not an object\n");
 		return false;
 	}
 
@@ -461,7 +461,7 @@ bool isReceivedJsonValid(const char *pJsonDocument, size_t jsonSize ) {
 							sizeof(jsonTokenStruct) / sizeof(jsonTokenStruct[0]));
 
 	if(tokenCount < 0) {
-		IOT_WARN("Failed to parse JSON: %d\n", tokenCount);
+		IOT_WARN(TAG, "Failed to parse JSON: %d\n", tokenCount);
 		return false;
 	}
 
@@ -483,7 +483,7 @@ bool extractClientToken(const char *pJsonDocument, size_t jsonSize, char *pExtra
 							sizeof(jsonTokenStruct) / sizeof(jsonTokenStruct[0]));
 
 	if(tokenCount < 0) {
-		IOT_WARN("Failed to parse JSON: %d\n", tokenCount);
+		IOT_WARN(TAG, "Failed to parse JSON: %d\n", tokenCount);
 		return false;
 	}
 

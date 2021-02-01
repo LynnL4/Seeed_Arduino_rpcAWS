@@ -26,11 +26,11 @@ extern "C" {
 #include <limits.h>
 
 #include "timer_platform.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_log.h"
 
-const static char *TAG = "aws_timer";
+
+#include "aws_iot_log.h"
+
+#define portTICK_PERIOD_MS			( ( uint32_t ) 1000 / 1000 )
 
 bool has_timer_expired(Timer *timer) {
     uint32_t now = xTaskGetTickCount();
@@ -67,7 +67,7 @@ uint32_t left_ms(Timer *timer) {
 
 void countdown_sec(Timer *timer, uint32_t timeout) {
     if (timeout > UINT32_MAX / 1000) {
-        ESP_LOGE(TAG, "timeout is out of range: %ds", timeout);
+        IOT_DEBUG(TAG, "timeout is out of range: %ds", timeout);
     }
     countdown_ms(timer, timeout * 1000);
 }

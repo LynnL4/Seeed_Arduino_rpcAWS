@@ -45,8 +45,10 @@ extern char AWS_IOT_HOST_ADDRESS[];
 
 // These values are defaults and are used for ShadowConnectParametersDefault.
 // You should override them from your own code.
-#define AWS_IOT_MQTT_CLIENT_ID         "ESP32" ///< MQTT client ID should be unique for every device
-#define AWS_IOT_MY_THING_NAME          "ESP32" ///< Thing Name of the Shadow this device is associated with
+//#define AWS_IOT_MQTT_CLIENT_ID         "ESP32" ///< MQTT client ID should be unique for every device
+//#define AWS_IOT_MY_THING_NAME          "ESP32" ///< Thing Name of the Shadow this device is associated with
+#define AWS_IOT_MQTT_CLIENT_ID         "CLIENTID" ///< MQTT client ID should be unique for every device
+#define AWS_IOT_MY_THING_NAME          "CLIENTID" ///< Thing Name of the Shadow this device is associated with
 
 // MQTT PubSub
 #define AWS_IOT_MQTT_TX_BUF_LEN 512 ///< Any time a message is sent out through the MQTT layer. The message is copied into this buffer anytime a publish is done. This will also be used in the case of Thing Shadow
@@ -66,7 +68,7 @@ extern char AWS_IOT_HOST_ADDRESS[];
 #define MAX_SHADOW_TOPIC_LENGTH_BYTES (MAX_SHADOW_TOPIC_LENGTH_WITHOUT_THINGNAME + MAX_SIZE_OF_THING_NAME) ///< This size includes the length of topic with Thing Name
 
 // Auto Reconnect specific config
-#define AWS_IOT_MQTT_MIN_RECONNECT_WAIT_INTERVAL 1000 ///< Minimum time before the First reconnect attempt is made as part of the exponential back-off algorithm
+#define AWS_IOT_MQTT_MIN_RECONNECT_WAIT_INTERVAL 128000 ///< Minimum time before the First reconnect attempt is made as part of the exponential back-off algorithm
 #define AWS_IOT_MQTT_MAX_RECONNECT_WAIT_INTERVAL 128000 ///< Maximum time interval after which exponential back-off will stop attempting to reconnect.
 
 #ifdef __cplusplus

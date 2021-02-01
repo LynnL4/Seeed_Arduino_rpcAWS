@@ -34,18 +34,27 @@ extern "C" {
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#ifndef TAG
+#define TAG "AWS IOT"
+#endif
+// #define ENABLE_IOT_DEBUG
+// #define ENABLE_IOT_WARN
+// #define ENABLE_IOT_INFO
+// #define ENABLE_IOT_ERROR
+// #define ENABLE_IOT_TRACE
+extern void aws_printf(const char *format, ...);
 /**
  * @brief Debug level logging macro.
  *
  * Macro to expose function, line number as well as desired log message.
  */
 #ifdef ENABLE_IOT_DEBUG
-#define IOT_DEBUG(...)    \
+#define IOT_DEBUG(tag, ...)    \
 	{\
-	printf("DEBUG:   %s L#%d ", __func__, __LINE__);  \
-	printf(__VA_ARGS__); \
-	printf("\n"); \
+	aws_printf("%s: ", tag); \
+	aws_printf("DEBUG:   %s L#%d ", __func__, __LINE__);  \
+	aws_printf(__VA_ARGS__); \
+	aws_printf("\n"); \
 	}
 #else
 #define IOT_DEBUG(...)
@@ -57,24 +66,24 @@ extern "C" {
  * Macro to print message function entry and exit
  */
 #ifdef ENABLE_IOT_TRACE
-#define FUNC_ENTRY    \
+#define IOT_FUNC_ENTRY    \
 	{\
-	printf("FUNC_ENTRY:   %s L#%d \n", __func__, __LINE__);  \
+	aws_printf("IOT_FUNC_ENTRY:   %s L#%d \n", __func__, __LINE__);  \
 	}
-#define FUNC_EXIT    \
+#define IOT_FUNC_EXIT    \
 	{\
-	printf("FUNC_EXIT:   %s L#%d \n", __func__, __LINE__);  \
+	aws_printf("IOT_FUNC_EXIT:   %s L#%d \n", __func__, __LINE__);  \
 	}
-#define FUNC_EXIT_RC(x)    \
+#define IOT_FUNC_EXIT_RC(x)    \
 	{\
-	printf("FUNC_EXIT:   %s L#%d Return Code : %d \n", __func__, __LINE__, x);  \
+	aws_printf("IOT_FUNC_EXIT:   %s L#%d Return Code : %d \n", __func__, __LINE__, x);  \
 	return x; \
 	}
 #else
-#define FUNC_ENTRY
+#define IOT_FUNC_ENTRY
 
-#define FUNC_EXIT
-#define FUNC_EXIT_RC(x) { return x; }
+#define IOT_FUNC_EXIT
+#define IOT_FUNC_EXIT_RC(x) { return x; }
 #endif
 
 /**
@@ -83,10 +92,11 @@ extern "C" {
  * Macro to expose desired log message.  Info messages do not include automatic function names and line numbers.
  */
 #ifdef ENABLE_IOT_INFO
-#define IOT_INFO(...)    \
+#define IOT_INFO(tag, ...)    \
 	{\
-	printf(__VA_ARGS__); \
-	printf("\n"); \
+	aws_printf("%s: ", tag); \
+	aws_printf(__VA_ARGS__); \
+	aws_printf("\n"); \
 	}
 #else
 #define IOT_INFO(...)
@@ -98,11 +108,12 @@ extern "C" {
  * Macro to expose function, line number as well as desired log message.
  */
 #ifdef ENABLE_IOT_WARN
-#define IOT_WARN(...)   \
+#define IOT_WARN(tag, ...)   \
 	{ \
-	printf("WARN:  %s L#%d ", __func__, __LINE__);  \
-	printf(__VA_ARGS__); \
-	printf("\n"); \
+	aws_printf("%s: ", tag); \
+	aws_printf("WARN:  %s L#%d ", __func__, __LINE__);  \
+	aws_printf(__VA_ARGS__); \
+	aws_printf("\n"); \
 	}
 #else
 #define IOT_WARN(...)
@@ -114,11 +125,12 @@ extern "C" {
  * Macro to expose function, line number as well as desired log message.
  */
 #ifdef ENABLE_IOT_ERROR
-#define IOT_ERROR(...)  \
+#define IOT_ERROR(tag, ...)  \
 	{ \
-	printf("ERROR: %s L#%d ", __func__, __LINE__); \
-	printf(__VA_ARGS__); \
-	printf("\n"); \
+	aws_printf("%s: ", tag); \
+	aws_printf("ERROR: %s L#%d ", __func__, __LINE__); \
+	aws_printf(__VA_ARGS__); \
+	aws_printf("\n"); \
 	}
 #else
 #define IOT_ERROR(...)
